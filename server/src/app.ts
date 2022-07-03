@@ -13,9 +13,7 @@ app.get('/', (req, res) => {
   res.sendFile(clientPath + '/index.html');
 });
 
-app.get('/main.js', (req, res) => {
-  res.sendFile(clientPath + '/js/main.js');
-})
+app.use(express.static(path.join(clientPath, 'js')));
 
 app.get('/styles.css', (req, res) => {
   res.sendFile(clientPath + '/css/styles.css');
