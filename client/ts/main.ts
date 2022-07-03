@@ -1,4 +1,3 @@
-console.log("hello world");
 const socket = io();
 
 socket.emit("client msg", "hi server");

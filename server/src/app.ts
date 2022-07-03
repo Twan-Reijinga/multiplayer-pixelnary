@@ -1,22 +1,24 @@
 import path = require('path');
-const clientPath = path.join(__dirname, '..', '..', 'client')
 import express = require('express');
-const app = express();
 import http = require('http');
-const server = http.createServer(app);
 import { Server } from 'socket.io';
-const io = new Server(server);
 
-app.get('/', (req: any, res: any) => {
+const clientPath = path.join(__dirname, '..', '..', 'client')
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+const PORT = 3000;
+
+app.get('/', (req, res) => {
   res.sendFile(clientPath + '/index.html');
 });
 
-app.get('/main.js', (req: any, res: any) => {
-  res.sendFile(clientPath + '/main.js');
+app.get('/main.js', (req, res) => {
+  res.sendFile(clientPath + '/js/main.js');
 })
 
-app.get('/styles.css', (req: any, res: any) => {
-  res.sendFile(clientPath + '/styles.css');
+app.get('/styles.css', (req, res) => {
+  res.sendFile(clientPath + '/css/styles.css');
 })
 
 io.on('connection', (socket) => {
@@ -24,12 +26,13 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
+  
   socket.on('client msg', (msg) => {
     console.log(msg)
   })
   socket.emit('server msg', 'hi client');
 });
 
-server.listen(3000, () => {
-  console.log('listening on *:3000');
+server.listen(PORT, () => {
+  console.log('listening on port', PORT);
 });
