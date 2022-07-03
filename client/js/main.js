@@ -1,6 +1,6 @@
 const socket = io();
 let gameBoard;
-let colors = ['red', 'green', 'blue'];
+let colorPalette;
 
 // socket.emit("client msg", "hi server");
 // socket.on("server msg", (msg) => {
@@ -13,7 +13,8 @@ function setup() {
     createCanvas(WIDTH, HEIGHT);
     frameRate(60);
     noStroke();
-
+    let colors = ['red', 'green', 'blue'];
+    colorPalette = new ColorPalette(colors, 32);
     gameBoard = new GameBoard(32, 24, 30, 32, 32);
 }
 
@@ -23,11 +24,11 @@ function draw() {
     if (mouseIsPressed) {
         gameBoard.fillTile();
     }
+    colorPalette.draw(32, gameBoard.height + 64, 32);
 }
 
 function keyPressed() {
-    if (keyCode >= 49 && keyCode <= 48 + colors.length) {
-        console.log(colors[keyCode - 49]);
-        gameBoard.setColor(keyCode - 49);
+    if (keyCode >= 49 && keyCode <= 48 + colorPalette.colors.length) {
+        colorPalette.setColor(keyCode - 49);
     }
 }
