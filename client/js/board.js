@@ -19,20 +19,6 @@ class GameBoard {
         }
     }
 
-    changeColor() {
-        if (
-            mouseIsPressed &&
-            mouseX >= this.marginX &&
-            mouseX < this.marginX + this.width &&
-            mouseY >= this.marginY &&
-            mouseY < this.marginY + this.height
-        ) {
-            let tileX = Math.floor((mouseX - this.marginX) / this.tileSize);
-            let tileY = Math.floor((mouseY - this.marginX) / this.tileSize);
-            this.tiles[tileY][tileX].changeColor(this.color);
-        }
-    }
-
     draw() {
         push();
         stroke(0);
@@ -44,15 +30,33 @@ class GameBoard {
         }
         pop();
     }
+
+    setColor(colorIndex) {
+        this.color = colors[colorIndex];
+    }
+
+    fillTile() {
+        if (
+            mouseIsPressed &&
+            mouseX >= this.marginX &&
+            mouseX < this.marginX + this.width &&
+            mouseY >= this.marginY &&
+            mouseY < this.marginY + this.height
+        ) {
+            let tileX = Math.floor((mouseX - this.marginX) / this.tileSize);
+            let tileY = Math.floor((mouseY - this.marginX) / this.tileSize);
+            this.tiles[tileY][tileX].setColor(this.color);
+        }
+    }
 }
 
 class Tile {
     constructor(tileSize) {
         this.tileSize = tileSize;
-        this.changeColor(color(255));
+        this.setColor(color(255));
     }
 
-    changeColor(color) {
+    setColor(color) {
         this.color = color;
     }
 

@@ -1,5 +1,6 @@
 const socket = io();
 let gameBoard;
+let colors = ['red', 'green', 'blue'];
 
 // socket.emit("client msg", "hi server");
 // socket.on("server msg", (msg) => {
@@ -20,6 +21,13 @@ function draw() {
     background(225);
     gameBoard.draw();
     if (mouseIsPressed) {
-        gameBoard.changeColor();
+        gameBoard.fillTile();
+    }
+}
+
+function keyPressed() {
+    if (keyCode >= 49 && keyCode <= 48 + colors.length) {
+        console.log(colors[keyCode - 49]);
+        gameBoard.setColor(keyCode - 49);
     }
 }
