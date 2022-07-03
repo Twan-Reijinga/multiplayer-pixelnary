@@ -12,7 +12,7 @@ class GameBoard {
         for (let i = 0; i < rows; i++) {
             let tilesInCol = [];
             for (let j = 0; j < cols; j++) {
-                tilesInCol.push(new Tile(tileSize, color(255)));
+                tilesInCol.push(new Tile('white'));
             }
             this.tiles.push(tilesInCol);
         }
@@ -24,7 +24,11 @@ class GameBoard {
         translate(this.marginX, this.marginY);
         for (let i = 0; i < this.tiles.length; i++) {
             for (let j = 0; j < this.tiles[i].length; j++) {
-                this.tiles[i][j].draw(this.tileSize * j, this.tileSize * i);
+                this.tiles[i][j].draw(
+                    this.tileSize * j,
+                    this.tileSize * i,
+                    this.tileSize
+                );
             }
         }
         pop();
@@ -44,11 +48,14 @@ class GameBoard {
             this.tiles[tileY][tileX].setColor(color);
         }
     }
+
+    getState() {
+        return JSON.stringify(this.tiles);
+    }
 }
 
 class Tile {
-    constructor(tileSize, color) {
-        this.tileSize = tileSize;
+    constructor(color) {
         this.setColor(color);
     }
 
@@ -56,8 +63,8 @@ class Tile {
         this.color = color;
     }
 
-    draw(marginX, marginY) {
+    draw(marginX, marginY, tileSize) {
         fill(this.color);
-        rect(marginX, marginY, this.tileSize, this.tileSize);
+        rect(marginX, marginY, tileSize, tileSize);
     }
 }

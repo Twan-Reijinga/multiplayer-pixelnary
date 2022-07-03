@@ -23,6 +23,7 @@ function draw() {
     gameBoard.draw();
     if (mouseIsPressed) {
         gameBoard.fillTile();
+        socket.emit('boardState', gameBoard.getState());
     }
     colorPalette.draw(32, gameBoard.height + 64, 32);
 }

@@ -24,11 +24,15 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
-  
-  socket.on('client msg', (msg) => {
-    console.log(msg)
+
+  socket.on('boardState', (board) => {
+    console.log(board);
   })
-  socket.emit('server msg', 'hi client');
+  
+  // socket.on('client msg', (msg) => {
+  //   console.log(msg)
+  // })
+  // socket.emit('server msg', 'hi client');
 });
 
 server.listen(PORT, () => {
