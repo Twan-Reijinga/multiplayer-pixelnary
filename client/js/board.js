@@ -34,9 +34,8 @@ class GameBoard {
         pop();
     }
 
-    fillTile() {
+    fillTile(color) {
         if (
-            mouseIsPressed &&
             mouseX >= this.marginX &&
             mouseX < this.marginX + this.width &&
             mouseY >= this.marginY &&
@@ -44,9 +43,14 @@ class GameBoard {
         ) {
             let tileX = Math.floor((mouseX - this.marginX) / this.tileSize);
             let tileY = Math.floor((mouseY - this.marginX) / this.tileSize);
-            let color = colorPalette.colors[colorPalette.colorIndex];
-            this.tiles[tileY][tileX].setColor(color);
+            let tile = this.tiles[tileY][tileX];
+            if (tile.color == color) {
+                return false;
+            }
+            tile.setColor(color);
+            return { x: tileX, y: tileY, color: color };
         }
+        return false;
     }
 
     getState() {

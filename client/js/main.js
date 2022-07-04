@@ -22,8 +22,11 @@ function draw() {
     background(225);
     gameBoard.draw();
     if (mouseIsPressed) {
-        gameBoard.fillTile();
-        socket.emit('boardState', gameBoard.getState());
+        let color = colorPalette.colors[colorPalette.colorIndex];
+        let change = gameBoard.fillTile(color);
+        if (change) {
+            socket.emit('boardState', JSON.stringify(change));
+        }
     }
     colorPalette.draw(32, gameBoard.height + 64, 32);
 }
