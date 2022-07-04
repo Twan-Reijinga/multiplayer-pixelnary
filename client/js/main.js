@@ -38,6 +38,8 @@ function setup() {
     createCanvas(WIDTH, HEIGHT);
     frameRate(60);
     noStroke();
+    textFont(font);
+    textAlign(LEFT, CENTER);
     let colors = ['red', 'green', 'blue'];
     colorPalette = new ColorPalette(colors, 32);
 }
@@ -46,15 +48,20 @@ function draw() {
     if (gameBoard) {
         background(225);
         gameBoard.draw();
+        colorPalette.draw(32, gameBoard.height + 64, 32);
+        textSize(30);
+        text('> Press space to start <', 32, 1024 - 128);
+        textSize(80);
+        text('Game Code: ' + gameCode, 32, 1024 - 64);
         if (mouseIsPressed) {
             let color = colorPalette.colors[colorPalette.colorIndex];
             let tile = gameBoard.findTile();
-            if (gameBoard.getTileColor(tile.x, tile.y) != color) {
+            if (tile && gameBoard.getTileColor(tile.x, tile.y) != color) {
                 tile['color'] = color;
                 socket.emit('boardState', JSON.stringify(tile));
+                gameBoard.fillTile(tile.x, tile.y, tile.color);
             }
         }
-        colorPalette.draw(32, gameBoard.height + 64, 32);
     }
 }
 
@@ -68,7 +75,7 @@ function keyPressed() {
 function startGame() {
     document.getElementsByTagName('canvas')[0].style.display = 'block';
     document.getElementById('menu').style.display = 'none';
-    gameBoard = new GameBoard(32, 24, 30, 32, 32);
+    gameBoard = new GameBoard(16, 48, 60, 32, 32);
 }
 
 function createGame() {
