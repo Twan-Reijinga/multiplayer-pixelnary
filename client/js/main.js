@@ -2,11 +2,31 @@ const socket = io();
 let gameBoard;
 let colorPalette;
 let font;
+let gameCode;
 
-// socket.emit("client msg", "hi server");
-// socket.on("server msg", (msg) => {
-//     console.log(msg);
-// });
+socket.on('gameCode', (code) => {
+    gameCode = code;
+    startGame();
+});
+
+socket.on('undefinedGame', () => {
+    document.getElementById('gameCodeInput').classList.add('error');
+    document.getElementsByClassName('error-container')[0].style.display =
+        'block';
+    console.log('undefined');
+
+    setTimeout(() => {
+        document.getElementById('gameCodeInput').classList.remove('error');
+        document.getElementsByClassName('error-container')[0].style.display =
+            'none';
+    }, 2500);
+});
+
+socket.on('boardState', (state) => {
+    state = JSON.parse(state);
+    console.log('boardState', state);
+    gameBoard.fillTile(state.x, state.y, state.color);
+});
 
 function preload() {
     font = loadFont('m5x7.ttf');
@@ -28,9 +48,10 @@ function draw() {
         gameBoard.draw();
         if (mouseIsPressed) {
             let color = colorPalette.colors[colorPalette.colorIndex];
-            let change = gameBoard.fillTile(color);
-            if (change) {
-                socket.emit('boardState', JSON.stringify(change));
+            let tile = gameBoard.findTile();
+            if (gameBoard.getTileColor(tile.x, tile.y) != color) {
+                tile['color'] = color;
+                socket.emit('boardState', JSON.stringify(tile));
             }
         }
         colorPalette.draw(32, gameBoard.height + 64, 32);
@@ -52,15 +73,14 @@ function startGame() {
 
 function createGame() {
     console.log('created game');
-    startGame();
+    socket.emit('newGame');
 }
 
 function joinGame() {
-    let gameCode = gameCodeInput.value.toUpperCase();
-    if (gameCode.length == 6) {
-        console.log('joined game:', gameCode);
+    let code = gameCodeInput.value.toUpperCase();
+    if (code.length == 6) {
+        socket.emit('joinGame', code);
     }
-    startGame();
 }
 
 document.getElementById('newGame').addEventListener('click', createGame);

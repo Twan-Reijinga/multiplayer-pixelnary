@@ -2,12 +2,15 @@ import path = require('path');
 import express = require('express');
 import http = require('http');
 import { Server } from 'socket.io';
+const { makeid } = require('./utils');
 
-const clientPath = path.join(__dirname, '..', '..', 'client')
+
+const clientPath = path.join(__dirname, '..', '..', 'client');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const PORT = 3000;
+let clientRooms = {}
 
 app.get('/', (req, res) => {
   res.sendFile(clientPath + '/index.html');
@@ -26,14 +29,22 @@ io.on('connection', (socket) => {
     console.log('user disconnected');
   });
 
+  socket.on('newGame', () => {
+    let roomName = makeid(6);
+    clientRooms[socket.id] = roomName;
+    console.log(roomName);
+    socket.emit('gameCode', roomName);
+    socket.join(roomName);
+  })
+
+  socket.on('joinGame', (roomName) => {
+    console.log(io.sockets.adapter.rooms);
+    socket.join(roomName);
+  })
+
   socket.on('boardState', (board) => {
     console.log(board);
   })
-  
-  // socket.on('client msg', (msg) => {
-  //   console.log(msg)
-  // })
-  // socket.emit('server msg', 'hi client');
 });
 
 server.listen(PORT, () => {
