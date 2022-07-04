@@ -14,6 +14,7 @@ app.get('/', (req, res) => {
 });
 
 app.use(express.static(path.join(clientPath, 'js')));
+app.use(express.static(path.join(clientPath, 'assets')));
 
 app.get('/styles.css', (req, res) => {
   res.sendFile(clientPath + '/css/styles.css');
