@@ -51,25 +51,6 @@ class GameBoard {
         return this.tiles[y][x].color;
     }
 
-    // fillTile(color) {
-    //     if (
-    //         mouseX >= this.marginX &&
-    //         mouseX < this.marginX + this.width &&
-    //         mouseY >= this.marginY &&
-    //         mouseY < this.marginY + this.height
-    //     ) {
-    //         let tileX = Math.floor((mouseX - this.marginX) / this.tileSize);
-    //         let tileY = Math.floor((mouseY - this.marginX) / this.tileSize);
-    //         let tile = this.tiles[tileY][tileX];
-    //         if (tile.color == color) {
-    //             return false;
-    //         }
-    //         tile.setColor(color);
-    //         return { x: tileX, y: tileY, color: color };
-    //     }
-    //     return false;
-    // }
-
     fillTile(x, y, color) {
         this.tiles[y][x].setColor(color);
     }

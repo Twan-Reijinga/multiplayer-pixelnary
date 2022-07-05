@@ -12,6 +12,11 @@
     box-sizing: border-box;
 }
 
+body {
+    display: flex;
+    justify-content: space-around;
+}
+
 canvas {
     display: none;
 }
@@ -112,7 +117,6 @@ input:focus {
 
 .error-message {
     padding-left: 8px;
-    font-weight: 700;
     font-size: 25px;
     color: white;
 }
