@@ -3,6 +3,7 @@ let gameBoard;
 let colorPalette;
 let font;
 let gameCode;
+let players = [];
 
 socket.on('gameCode', (code) => {
     gameCode = code;
@@ -11,15 +12,21 @@ socket.on('gameCode', (code) => {
 
 socket.on('undefinedGame', () => {
     document.getElementById('gameCodeInput').classList.add('error');
-    document.getElementsByClassName('error-container')[0].style.display =
-        'block';
-    console.log('undefined');
+    let errorContainer = document.getElementsByClassName('error-container')[0];
+    errorContainer.style.display = 'block';
 
     setTimeout(() => {
         document.getElementById('gameCodeInput').classList.remove('error');
-        document.getElementsByClassName('error-container')[0].style.display =
-            'none';
+        errorContainer.style.display = 'none';
     }, 2500);
+});
+
+socket.on('joinedPlayer', (player) => {
+    players.push(player);
+});
+
+socket.on('leavedPlayer', (player) => {
+    players.splice(players.indexOf(player), 1);
 });
 
 socket.on('boardState', (state) => {
@@ -36,7 +43,7 @@ function setup() {
     const WIDTH = 1024;
     const HEIGHT = 1024;
     createCanvas(WIDTH, HEIGHT);
-    frameRate(60);
+    frameRate(10);
     noStroke();
     textFont(font);
     let colors = ['red', 'green', 'blue'];
@@ -50,9 +57,7 @@ function draw() {
         colorPalette.draw(32, gameBoard.height + 64, 32);
         textAlign(LEFT, CENTER);
         textSize(30);
-        text('> Press space to start <', 32, 1024 - 128);
-        textSize(80);
-        text('Game Code: ' + gameCode, 32, 1024 - 64);
+        text('Use numberkeys to select color', 32, 1024 - 128);
         if (mouseIsPressed) {
             let color = colorPalette.colors[colorPalette.colorIndex];
             let tile = gameBoard.findTile();
@@ -61,6 +66,13 @@ function draw() {
                 socket.emit('boardState', JSON.stringify(tile));
                 gameBoard.fillTile(tile.x, tile.y, tile.color);
             }
+        }
+    } else if (players.length) {
+        rect(64, 384, 1024 - 128, 512);
+        for (let i = 0; i < players.length; i++) {
+            textAlign(CENTER, CENTER);
+            textSize(50);
+            text('player ' + players[i], 512, 420 + i * 64);
         }
     }
 }
@@ -79,18 +91,18 @@ function drawLobby() {
     textAlign(CENTER, CENTER);
     textSize(80);
     text('PIXELNARY - Lobby', 512, 128);
-
     textSize(60);
     text('Game code: ' + gameCode, 512, 300);
     drawPlayerList(64, 384, 1024 - 128, 512);
+
+    let quitButton = createButton('Quit');
     let startButton = createButton('Start');
-    startButton.position(110, 1024 - 128);
+    startButton.position(48, 1024 - 128);
+    quitButton.position(745, 1024 - 128);
     startButton.mouseClicked(() => {
         startButton.remove();
         startGame();
     });
-    let quitButton = createButton('Quit');
-    quitButton.position(805, 1024 - 128);
     quitButton.mouseClicked(() => {
         window.location.reload();
     });
@@ -100,6 +112,7 @@ function drawPlayerList(x, y, width, height) {
     rect(x, y, width, height);
     textSize(30);
     text('Waiting for players...', width / 2 + x, (height / 10) * 9 + y);
+    socket.emit('getPlayers', gameCode);
 }
 
 function startGame() {

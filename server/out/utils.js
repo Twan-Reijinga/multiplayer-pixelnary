@@ -9,5 +9,5 @@ function makeid(length) {
             Math.floor(Math.random() * characters.length)
         );
     }
-    return '000000';
+    return result;
 }

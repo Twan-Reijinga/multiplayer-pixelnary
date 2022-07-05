@@ -12,11 +12,6 @@
     box-sizing: border-box;
 }
 
-body {
-    display: flex;
-    justify-content: space-around;
-}
-
 canvas {
     display: none;
 }

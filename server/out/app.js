@@ -20,9 +20,11 @@ app.use(express.static(path.join(clientPath, 'css')));
 app.use(express.static(path.join(clientPath, 'js')));
 
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    console.log(socket.id, 'connected');
     socket.on('disconnect', () => {
-        console.log('user disconnected');
+        io.to(clientRooms[socket.id]).emit('leavedPlayer', socket.id);
+        delete clientRooms[socket.id];
+        console.log(socket.id, 'disconnected');
     });
 
     socket.on('newGame', () => {
@@ -35,6 +37,7 @@ io.on('connection', (socket) => {
 
     socket.on('joinGame', (roomName) => {
         if (io.sockets.adapter.rooms.has(roomName)) {
+            io.to(roomName).emit('joinedPlayer', socket.id);
             socket.join(roomName);
             socket.emit('gameCode', roomName);
             clientRooms[socket.id] = roomName;
@@ -42,6 +45,19 @@ io.on('connection', (socket) => {
         } else {
             socket.emit('undefinedGame');
             console.log(socket.id, "can't join", roomName, ': not created');
+        }
+    });
+
+    socket.on('getPlayers', (roomName) => {
+        console.log('get players in ', roomName);
+        let players = [];
+        for (let key in clientRooms) {
+            if (clientRooms[key] == roomName) {
+                players.push(key);
+            }
+        }
+        for (let i = 0; i < players.length; i++) {
+            socket.emit('joinedPlayer', players[i]);
         }
     });
 
