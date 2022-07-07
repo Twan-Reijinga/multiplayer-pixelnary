@@ -13,9 +13,10 @@ const PORT = 3000;
 let clientRooms = {};
 let startedGames = [];
 let drawItem = {};
+let rounds = {};
 
 app.get('/', (req, res) => {
-    res.sendFile(clientPath + '/index.html');
+    res.sendFile(path.join(clientPath, 'index.html'));
 });
 app.use(express.static(path.join(clientPath, 'assets')));
 app.use(express.static(path.join(clientPath, 'css')));
@@ -72,7 +73,8 @@ io.on('connection', (socket) => {
     socket.on('startGame', (roomName) => {
         startedGames.push(roomName);
         io.to(roomName).emit('startGame');
-        io.to(roomName).emit('startRound', 0);
+        rounds[roomName] = 0;
+        io.to(roomName).emit('startRound', rounds[roomName]);
     });
 
     socket.on('boardState', (board) => {
@@ -83,15 +85,19 @@ io.on('connection', (socket) => {
     socket.on('drawItem', (item) => {
         roomName = clientRooms[socket.id];
         drawItem[roomName] = item;
-        console.log(drawItem);
     });
 
     socket.on('guess', (guess) => {
         roomName = clientRooms[socket.id];
         if (guess == drawItem[roomName]) {
             console.log(socket.id, 'guessed', guess, 'correct!');
+            io.to(roomName).emit('correctGuess', {
+                clientId: socket.id,
+                word: guess,
+            });
+            rounds[roomName]++;
+            io.to(roomName).emit('startRound', rounds[roomName]);
         } else {
-            console.log(drawItem[roomName], guess);
             console.log(socket.id, 'guessed', guess);
         }
     });

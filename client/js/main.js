@@ -40,8 +40,17 @@ socket.on('ownPlayerId', (id) => {
     playerId = id;
 });
 
+socket.on('correctGuess', (guess) => {
+    console.log(guess);
+    if (guess.clientId == playerId) {
+        alert('You guessed the word "' + guess.word + '" correct');
+        return;
+    }
+    alert(guess.clientId + ' guessed the word "' + guess.word + '" correct');
+});
+
 socket.on('startRound', (playerIndex) => {
-    drawingPlayer = players[playerIndex];
+    drawingPlayer = players[playerIndex % players.length];
     console.log(drawingPlayer);
     if (drawingPlayer == playerId) {
         let drawItem = prompt('What are you going to draw?').toUpperCase();
