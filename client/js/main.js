@@ -1,6 +1,6 @@
 const socket = io();
 let gameBoard;
-let colorPalette;
+let colorPalette = 0;
 let font;
 let gameCode;
 let players = [];
@@ -43,6 +43,9 @@ socket.on('ownPlayerId', (id) => {
 socket.on('startRound', (playerIndex) => {
     drawingPlayer = players[playerIndex];
     console.log(drawingPlayer);
+    if (drawingPlayer != playerId) {
+        drawGuesser();
+    }
 });
 
 socket.on('boardState', (state) => {
@@ -72,11 +75,16 @@ function draw() {
         if (drawingPlayer == playerId) {
             colorPalette.draw(32, gameBoard.height + 64, 32);
         } else {
-            //guess screen
+            fill(255);
+            rect(32, 850, 710, 150);
+            fill(0);
+            textSize(50);
+            textAlign(LEFT, CENTER);
+            text('Guess what the player is drawing...', 80, 875);
         }
     } else if (players.length) {
         fill(255);
-        rect(64, 384, 1024 - 128, 512);
+        rect(64, 384, 896, 512);
         for (let i = 0; i < players.length; i++) {
             if (players[i] == playerId) {
                 fill('red');
@@ -92,6 +100,7 @@ function draw() {
 
 function keyPressed() {
     let colors = colorPalette.colors;
+
     if (gameBoard && keyCode >= 49 && keyCode <= 48 + colors.length) {
         colorPalette.setColor(keyCode - 49);
     }
@@ -106,12 +115,12 @@ function drawLobby() {
     text('PIXELNARY - Lobby', 512, 128);
     textSize(60);
     text('Game code: ' + gameCode, 512, 300);
-    drawPlayerList(64, 384, 1024 - 128, 512);
+    drawPlayerList(64, 384, 896, 512);
 
     let quitButton = createButton('Quit');
     startButton = createButton('Start');
-    startButton.position(48, 1024 - 128);
-    quitButton.position(745, 1024 - 128);
+    startButton.position(48, 896);
+    quitButton.position(745, 896);
     startButton.mouseClicked(() => {
         socket.emit('startGame', gameCode);
         startGame();
@@ -127,6 +136,28 @@ function drawPlayerList(x, y, width, height) {
     textSize(30);
     text('Waiting for players...', width / 2 + x, (height / 10) * 9 + y);
     socket.emit('getPlayers', gameCode);
+}
+
+function drawGuesser() {
+    let guessInput = createInput('');
+    guessInput.position(64, 900);
+    guessInput.id('guessInput');
+    guessInput = document.getElementById('guessInput');
+    guessInput.placeholder = 'Do a guess...';
+    guessInput.addEventListener('keypress', (e) => {
+        let keyCode = e.keyCode || e.which;
+        if (keyCode === 13) {
+            let guess = guessInput.value.toUpperCase();
+            socket.emit('guess', guess);
+            console.log(guess);
+            guessInput.value = '';
+        }
+    });
+}
+
+function onInput() {
+    clear();
+    console.log(this.value());
 }
 
 function startGame() {
@@ -149,8 +180,8 @@ document.getElementById('newGame').addEventListener('click', createGame);
 document.getElementById('joinGame').addEventListener('click', joinGame);
 let gameCodeInput = document.getElementById('gameCodeInput');
 gameCodeInput.addEventListener('keypress', (e) => {
-    let keycode = e.keyCode || e.which;
-    if (keycode === 13) {
+    let keyCode = e.keyCode || e.which;
+    if (keyCode === 13) {
         joinGame();
     }
 });

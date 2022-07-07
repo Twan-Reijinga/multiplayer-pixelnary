@@ -10,5 +10,5 @@ function makeid(length) {
             Math.floor(Math.random() * characters.length)
         );
     }
-    return result;
+    return '000000';
 }

@@ -78,6 +78,10 @@ io.on('connection', (socket) => {
         let roomName = clientRooms[socket.id];
         io.to(roomName).emit('boardState', board);
     });
+
+    socket.on('guess', (guess) => {
+        console.log(socket.id, 'guessed', guess);
+    });
 });
 
 server.listen(PORT, () => {

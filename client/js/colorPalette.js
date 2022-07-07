@@ -26,7 +26,7 @@ class ColorPalette {
         pop();
         textAlign(LEFT, CENTER);
         textSize(30);
-        text('Use numberkeys to select color', 32, 1024 - 128);
+        text('Use numberkeys to select color', 32, 896);
         if (mouseIsPressed) {
             let color = colorPalette.colors[colorPalette.colorIndex];
             let tile = gameBoard.findTile();
