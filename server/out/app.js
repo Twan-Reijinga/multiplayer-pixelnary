@@ -12,6 +12,7 @@ const io = new socket_io.Server(server);
 const PORT = 3000;
 let clientRooms = {};
 let startedGames = [];
+let drawItem = {};
 
 app.get('/', (req, res) => {
     res.sendFile(clientPath + '/index.html');
@@ -79,8 +80,20 @@ io.on('connection', (socket) => {
         io.to(roomName).emit('boardState', board);
     });
 
+    socket.on('drawItem', (item) => {
+        roomName = clientRooms[socket.id];
+        drawItem[roomName] = item;
+        console.log(drawItem);
+    });
+
     socket.on('guess', (guess) => {
-        console.log(socket.id, 'guessed', guess);
+        roomName = clientRooms[socket.id];
+        if (guess == drawItem[roomName]) {
+            console.log(socket.id, 'guessed', guess, 'correct!');
+        } else {
+            console.log(drawItem[roomName], guess);
+            console.log(socket.id, 'guessed', guess);
+        }
     });
 });
 

@@ -43,7 +43,10 @@ socket.on('ownPlayerId', (id) => {
 socket.on('startRound', (playerIndex) => {
     drawingPlayer = players[playerIndex];
     console.log(drawingPlayer);
-    if (drawingPlayer != playerId) {
+    if (drawingPlayer == playerId) {
+        let drawItem = prompt('What are you going to draw?').toUpperCase();
+        socket.emit('drawItem', drawItem);
+    } else {
         drawGuesser();
     }
 });
@@ -140,7 +143,7 @@ function drawPlayerList(x, y, width, height) {
 
 function drawGuesser() {
     let guessInput = createInput('');
-    guessInput.position(64, 900);
+    guessInput.position(54, 900);
     guessInput.id('guessInput');
     guessInput = document.getElementById('guessInput');
     guessInput.placeholder = 'Do a guess...';
