@@ -11,6 +11,7 @@ const server = http.createServer(app);
 const io = new socket_io.Server(server);
 const PORT = 3000;
 let clientRooms = {};
+let startedGames = [];
 
 app.get('/', (req, res) => {
     res.sendFile(clientPath + '/index.html');
@@ -37,6 +38,11 @@ io.on('connection', (socket) => {
 
     socket.on('joinGame', (roomName) => {
         if (io.sockets.adapter.rooms.has(roomName)) {
+            if (startedGames.find((e) => e == roomName)) {
+                socket.emit('undefinedGame');
+                console.log(socket.id, "can't join", roomName, '- started');
+                return;
+            }
             io.to(roomName).emit('joinedPlayer', socket.id);
             socket.join(roomName);
             socket.emit('gameCode', roomName);
@@ -44,7 +50,7 @@ io.on('connection', (socket) => {
             console.log(socket.id, 'joined', roomName);
         } else {
             socket.emit('undefinedGame');
-            console.log(socket.id, "can't join", roomName, ': not created');
+            console.log(socket.id, "can't join", roomName, '- not created');
         }
     });
 
@@ -59,10 +65,16 @@ io.on('connection', (socket) => {
         for (let i = 0; i < players.length; i++) {
             socket.emit('joinedPlayer', players[i]);
         }
+        socket.emit('ownPlayerId', socket.id);
+    });
+
+    socket.on('startGame', (roomName) => {
+        startedGames.push(roomName);
+        io.to(roomName).emit('startGame');
+        io.to(roomName).emit('startRound', 0);
     });
 
     socket.on('boardState', (board) => {
-        console.log(socket.id, 'changed', board);
         let roomName = clientRooms[socket.id];
         io.to(roomName).emit('boardState', board);
     });

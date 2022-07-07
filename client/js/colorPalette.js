@@ -24,6 +24,18 @@ class ColorPalette {
             );
         }
         pop();
+        textAlign(LEFT, CENTER);
+        textSize(30);
+        text('Use numberkeys to select color', 32, 1024 - 128);
+        if (mouseIsPressed) {
+            let color = colorPalette.colors[colorPalette.colorIndex];
+            let tile = gameBoard.findTile();
+            if (tile && gameBoard.getTileColor(tile.x, tile.y) != color) {
+                tile['color'] = color;
+                socket.emit('boardState', JSON.stringify(tile));
+                gameBoard.fillTile(tile.x, tile.y, tile.color);
+            }
+        }
     }
 
     setColor(colorIndex) {
